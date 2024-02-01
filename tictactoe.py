@@ -140,7 +140,7 @@ def minimax(board):
         action_value = ()
         for action in all_actions:
            temp = v
-           v = max(v, maxValue(board))
+           v = max(v, maxValue(result(board, action)))
            if v > temp:
                action_value = action
                if v == 1:
@@ -155,7 +155,7 @@ def minimax(board):
         action_value = ()
         for action in all_actions:
            temp = v
-           v = min(v, minValue(board))
+           v = min(v, minValue(result(board, action)))
            if v < temp:
                action_value = action
                if v == -1:
