@@ -2,7 +2,7 @@
 Tic Tac Toe Player
 """
 
-import math, copy
+import math, copy, operator
 
 X = "X"
 O = "O"
@@ -137,50 +137,68 @@ def minimax(board):
     # now according to player I will choose min or max value function
     if player(board) == "X":
         v = float('-inf')
-        action_value = ()
+        res_store = []
         for action in all_actions:
-           temp = v
-           v = max(v, maxValue(board))
-           if v > temp:
-               action_value = action
-               if v == 1:
-                   break
-        return action_value
+           res = maxValue(result(board, action))
+           print(f"{action} go result", res, "\n\n")
+           v = max(v, res[1])
+           res_store.append((res[0], res[1], action))
+        res_store.sort(key = operator.itemgetter(1,0), reverse=False)
+        # print("Max: ",res_store)
+        return res_store[0][2]
 
 
 
 
     if player(board) == "O":
         v = float('inf')
-        action_value = ()
+        res_store = []
         for action in all_actions:
-           temp = v
-           v = min(v, minValue(board))
-           if v < temp:
-               action_value = action
-               if v == -1:
-                   break
-        return action_value
+           res = minValue(result(board, action))
+           print(f"\n {action} go result", res, "\n\n")
+           v = min(v, res[1])
+           res_store.append((res[0], res[1], action))
+        res_store.sort(key = operator.itemgetter(1,0))
+        print("Min: ",res_store)
+        return res_store[0][2]
 
     # raise NotImplementedError
 
 
-def maxValue(board):
+def maxValue(board, depth=0):
     if terminal(board):
-        return utility(board)
+        return (depth+1, utility(board))
     all_actions = actions(board)
     v = float('-inf')
+    compare = []
     for action in all_actions:
-        v = max(v, minValue(result(board, action)))
-    return v
+        res = minValue(result(board, action))
+        depth = res[0]
+        v = max(v, res[1])
+        compare.append((depth, v, action))
+    compare.sort(key = operator.itemgetter(1,0))
+    i = 0
+    mydepth = 0
+    while i >= 0:
+        if compare[i][1] != v:
+            break
+        mydepth = compare[i][0]
+        i -= 1
+    return (compare[0][0]+1, compare[0][1])
 
     
 
-def minValue(board):
+def minValue(board, depth=0):
     if terminal(board):
-        return utility(board)
+        return (depth+1, utility(board))
     all_actions = actions(board)
     v = float('inf')
+    compare = []
     for action in all_actions:
-        v = min(v, maxValue(result(board, action)))
-    return v
+        res = maxValue(result(board, action))
+        depth = res[0]
+        v = min(v, res[1])
+        compare.append((depth, v, action))
+    compare.sort(key = operator.itemgetter(1,0))
+    print("min comp:", compare, " /n")
+    return (compare[0][0]+1, compare[0][1])
